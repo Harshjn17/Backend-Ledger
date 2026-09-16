@@ -6,5 +6,8 @@ const router = express.Router()
 // POST - /api/auth/register
 router.post('/register', authController.userRegister)
 
+// Login API
+// POST - /api/auth/login
+router.post('/login', authController.userLogin)
 
 module.exports = router

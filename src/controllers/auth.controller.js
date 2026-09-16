@@ -40,4 +40,39 @@ async function userRegister(req, res) {
     })
 }
 
-module.exports = { userRegister }
+// User register controller
+// POST - /api/auth/register
+
+async function userLogin(req, res) {
+    const { email, password } = req.body
+    
+    const user = await userModel.findOne({ email }).select("+password") 
+
+    if(!user){
+        return res.status(401).json({ message: "Email and Password are INVALID" })
+    }
+
+    const isValidPass = await user.comparePassword(password)
+
+    if(!isValidPass){
+        return res.status(401).json({ message: "Password is INVALID" })
+    }
+
+    // Then give user a jwt token
+    const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {expiresIn: "3d"})
+
+    res.cookie("token", token)
+
+    res.status(200).json({
+        message: "User Login successfully",
+        user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+        },
+        token
+    })
+    
+}
+
+module.exports = { userRegister, userLogin }
